@@ -75,7 +75,7 @@ Set the following before running the real LLM baseline:
 export API_BASE_URL="https://api.openai.com/v1"      # or router endpoint
 export MODEL_NAME="gpt-4.1-mini"
 export OPENAI_API_KEY="sk-..."
-# or provide HF_TOKEN / API KEY as described in the brief
+# or provide HF_TOKEN / API_KEY as described in the brief
 ```
 
 ### Run baseline locally
