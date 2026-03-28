@@ -1,3 +1,14 @@
+---
+title: My Env
+emoji: 🐠
+colorFrom: yellow
+colorTo: purple
+sdk: docker
+pinned: false
+license: mit
+short_description: Ops Support Triage OpenEnv environment
+---
+
 # Ops Support Triage (OpenEnv)
 
 Ops Support Triage is a real-world OpenEnv environment where an agent acts as an operations
