@@ -1,0 +1,30 @@
+id: ops-support-triage
+name: Ops Support Triage
+version: 1.0.0
+description: >-
+  Real-world operations support environment where agents triage enterprise tickets,
+  craft compliant responses, and coordinate incidents across multiple teams.
+license: MIT
+homepage: https://huggingface.co/spaces/example/ops-support-triage
+tags:
+  - operations
+  - support
+  - openenv
+  - real-world
+authors:
+  - name: Hackathon Builder
+    email: builder@example.com
+entry_point: support_triage_env.env:OpsSupportEnv
+observation_model: support_triage_env.models:Observation
+action_model: support_triage_env.models:Action
+reward_model: support_triage_env.models:Reward
+tasks:
+  - id: easy_password_reset
+    difficulty: easy
+    description: Recover Insight dashboard access after SSO cutover
+  - id: medium_seat_billing
+    difficulty: medium
+    description: Calculate and communicate a multi-thousand dollar seat credit
+  - id: hard_incident_coordination
+    difficulty: hard
+    description: Coordinate incident INC-4471 with 30 minute customer updates
