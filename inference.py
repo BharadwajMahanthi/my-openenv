@@ -135,18 +135,31 @@ def choose_action(observation, episode_state):
 def run_episode(task_id: str) -> Dict[str, float]:
     env = OpsSupportEnv(task_id=task_id)
     observation = env.reset(task_id)
+    print(f"[START] task={task_id}", flush=True)
     done = False
     episode_state: Dict[str, bool] = {}
     last_info: Dict[str, float] = {"task_score": 0.0}
+    step_index = 0
+
     while not done and observation.remaining_steps > 0:
         action = choose_action(observation, episode_state)
         step_result = env.step(action)
         observation = step_result.observation
         done = step_result.done
         last_info = step_result.info
+        step_index += 1
+        reward_value = float(step_result.reward.value)
+        score_value = float(last_info.get("task_score", 0.0))
+        print(
+            f"[STEP] task={task_id} step={step_index} reward={reward_value:.3f} score={score_value:.3f} done={done}",
+            flush=True,
+        )
         if done:
             break
-    return {"task_id": task_id, "score": float(last_info.get("task_score", 0.0))}
+
+    final_score = float(last_info.get("task_score", 0.0))
+    print(f"[END] task={task_id} score={final_score:.3f} steps={step_index}", flush=True)
+    return {"task_id": task_id, "score": final_score}
 
 
 def main() -> None:
