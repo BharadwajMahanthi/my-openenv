@@ -23,7 +23,7 @@ except ImportError:  # pragma: no cover - fallback for offline testing
 from support_triage_env import OpsSupportEnv
 
 API_BASE_URL = os.getenv("API_BASE_URL")
-MODEL_NAME = os.getenv("MODEL_NAME")
+MODEL_NAME = os.getenv("MODEL_NAME") or os.getenv("DEFAULT_MODEL_NAME") or "gpt-4.1-mini"
 API_KEY = (
     os.getenv("API_KEY")
     or os.getenv("OPENAI_API_KEY")
@@ -65,13 +65,6 @@ BASELINE_FALLBACKS: Dict[str, str] = {
 }
 
 
-def _extract_text(response) -> str:
-    try:
-        return response.output[0].content[0].text.value
-    except Exception:
-        return ""
-
-
 def llm_reply(task_id: str, observation_summary: str) -> str:
     prompt = (
         "You triage enterprise support tickets. Write a concise but complete customer-ready response "
@@ -79,17 +72,20 @@ def llm_reply(task_id: str, observation_summary: str) -> str:
     )
     if _client is None:
         return BASELINE_FALLBACKS[task_id]
-    response = _client.responses.create(
-        model=MODEL_NAME,
-        temperature=0.2,
-        max_output_tokens=400,
-        input=[
-            {"role": "system", "content": "You are a calm, policy-compliant support agent."},
-            {"role": "user", "content": prompt},
-        ],
-    )
-    text = _extract_text(response).strip()
-    return text or BASELINE_FALLBACKS[task_id]
+    try:
+        completion = _client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": "You are a calm, policy-compliant support agent."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.2,
+            max_tokens=400,
+        )
+        text = completion.choices[0].message.content or ""
+    except Exception:
+        return BASELINE_FALLBACKS[task_id]
+    return text.strip() or BASELINE_FALLBACKS[task_id]
 
 
 def choose_action(observation, episode_state):
