@@ -49,6 +49,10 @@ class TaskConfig:
     requirements: List[TaskRequirement]
 
 
+MIN_SCORE = 1e-3
+MAX_SCORE = 1.0 - MIN_SCORE
+
+
 class TaskGrader:
     """Deterministic grader computing progress and rewards."""
 
@@ -73,7 +77,8 @@ class TaskGrader:
                     coverage=round(cov, 3),
                 )
             )
-        return min(total, 1.0), breakdown
+        clamped = max(MIN_SCORE, min(total, MAX_SCORE))
+        return clamped, breakdown
 
 
 TASK_REGISTRY: Dict[str, TaskConfig] = {}
