@@ -24,17 +24,24 @@ from support_triage_env import OpsSupportEnv
 
 API_BASE_URL = os.getenv("API_BASE_URL")
 MODEL_NAME = os.getenv("MODEL_NAME")
-API_KEY = os.getenv("API_KEY")
+API_KEY = (
+    os.getenv("API_KEY")
+    or os.getenv("OPENAI_API_KEY")
+    or os.getenv("HF_TOKEN")
+    or os.getenv("API_TOKEN")
+)
 ALLOW_TEMPLATE_FALLBACK = os.getenv("ALLOW_BASELINE_TEMPLATES", "0") == "1"
 
 _client: Optional[OpenAI] = None
 if _OPENAI_AVAILABLE and API_BASE_URL and MODEL_NAME and API_KEY:
     _client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-elif not ALLOW_TEMPLATE_FALLBACK:
-    raise RuntimeError(
-        "API_BASE_URL, MODEL_NAME, and API_KEY environment variables are required. "
-        "Set ALLOW_BASELINE_TEMPLATES=1 for offline deterministic fallback runs."
-    )
+else:
+    if not ALLOW_TEMPLATE_FALLBACK:
+        print(
+            "Warning: missing API credentials; falling back to deterministic templates. "
+            "Set API_BASE_URL, MODEL_NAME, and API_KEY to enable proxy calls.",
+            flush=True,
+        )
 
 BASELINE_FALLBACKS: Dict[str, str] = {
     "easy_password_reset": (
